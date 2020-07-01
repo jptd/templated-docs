@@ -23,12 +23,12 @@ test_requirements = [
 
 setup(
     name='jpt-templated-docs',
-    version='0.3.4',
+    version='0.4.0',
     description=('Generate PDF, MS Word and Excel documents from templates '
                  'in Django.'),
     long_description=readme + '\n\n' + history,
-    author="Sian Lerk Lau",
-    author_email='kiawin@gmail.com',
+    author="Jewel Paymentech",
+    author_email='jafnee.jesmee@jewelpaymentech.com',
     url='https://github.com/jptd/templated-docs',
     packages=find_packages(),
     include_package_data=True,
@@ -41,12 +41,7 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],
