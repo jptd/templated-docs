@@ -4,5 +4,5 @@ from invoices.views import invoice_view
 
 
 urlpatterns = [
-    url(r'^$', invoice_view),
+    url(r"^$", invoice_view),
 ]

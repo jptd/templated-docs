@@ -13,6 +13,7 @@ class InternalsTestCase(TestCase):
         Creating a document from a correct template doesn't raise any
         exception.
         """
-        filename = fill_template('correct_template.odt', {'name': 'John'},
-                                 output_format='pdf')
+        filename = fill_template(
+            "correct_template.odt", {"name": "John"}, output_format="pdf"
+        )
         os.unlink(filename)

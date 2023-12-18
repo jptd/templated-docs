@@ -6,26 +6,31 @@ from django.db import migrations, models
 
 
 def create_customers(apps, schema_editor):
-    Customer = apps.get_model('invoices', 'Customer')
-    Customer.objects.create(name='John Doe', address='Some street\nSome town')
-    Customer.objects.create(name='Apple', address='Other street\nOther town')
+    Customer = apps.get_model("invoices", "Customer")
+    Customer.objects.create(name="John Doe", address="Some street\nSome town")
+    Customer.objects.create(name="Apple", address="Other street\nOther town")
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Customer',
+            name="Customer",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True,
-                                        serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200)),
-                ('address', models.TextField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=200)),
+                ("address", models.TextField()),
             ],
         ),
         migrations.RunPython(create_customers),
