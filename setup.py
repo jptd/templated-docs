@@ -13,7 +13,7 @@ with open("HISTORY.rst") as history_file:
 
 requirements = [
     "pylokit==0.8.1",
-    "django=<4.2.8",
+    "django==4.2.8",
     "billiard>=3.5.0.2,<3.6.0",
 ]
 
