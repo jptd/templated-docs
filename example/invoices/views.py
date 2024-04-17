@@ -1,4 +1,4 @@
-#--coding: utf8--
+# --coding: utf8--
 
 from django.shortcuts import render
 
@@ -12,12 +12,12 @@ def invoice_view(request):
     form = InvoiceForm(request.POST or None)
 
     if form.is_valid():
-        doctype = form.cleaned_data['format']
+        doctype = form.cleaned_data["format"]
         filename = fill_template(
-            'invoices/invoice.odt', form.cleaned_data,
-            output_format=doctype)
-        visible_filename = 'invoice.{}'.format(doctype)
+            "invoices/invoice.odt", form.cleaned_data, output_format=doctype
+        )
+        visible_filename = "invoice.{}".format(doctype)
 
         return FileResponse(filename, visible_filename)
     else:
-        return render(request, 'invoices/form.html', {'form': form})
+        return render(request, "invoices/form.html", {"form": form})

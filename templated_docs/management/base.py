@@ -14,20 +14,29 @@ class DocumentGenerationCommand(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument('template_name', type=str)
-        parser.add_argument('--format', type=str, default='odt',
-                            help='Convert a document to specified format')
-        parser.add_argument('--output_file', type=str, default=None,
-                            help='Put the result into this file.')
+        parser.add_argument("template_name", type=str)
+        parser.add_argument(
+            "--format",
+            type=str,
+            default="odt",
+            help="Convert a document to specified format",
+        )
+        parser.add_argument(
+            "--output_file",
+            type=str,
+            default=None,
+            help="Put the result into this file.",
+        )
 
     def handle(self, template_name, **options):
-        output_format = options['format']
+        output_format = options["format"]
         temp_name = fill_template(
             template_name,
             self.get_document_context(template_name, **options),
-            output_format)
+            output_format,
+        )
 
-        out_file = options['output_file'] or temp_name
+        out_file = options["output_file"] or temp_name
         if out_file != temp_name:
             os.rename(temp_name, out_file)
         print(out_file)
@@ -37,5 +46,6 @@ class DocumentGenerationCommand(BaseCommand):
         Fill the context for passing in the document template.
         """
         raise NotImplementedError(
-            'subclasses of GenerateDocumentCommand must provide a '
-            'get_document_context() method')
+            "subclasses of GenerateDocumentCommand must provide a "
+            "get_document_context() method"
+        )

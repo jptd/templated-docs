@@ -22,12 +22,13 @@ from django.utils.encoding import smart_bytes, smart_str
 from pylokit import Office
 
 import logging
+
 log = logging.getLogger(__name__)
 
-__version__ = '0.4.0'
+__version__ = "0.4.0"
 
 
-IMAGES_CONTEXT_KEY = '_templated_docs_imgs'
+IMAGES_CONTEXT_KEY = "_templated_docs_imgs"
 
 
 def _get_template_loaders():
@@ -36,9 +37,9 @@ def _get_template_loaders():
     """
     loaders = []
 
-    for loader_name in engines['django'].engine.loaders:
-        loader = engines['django'].engine.find_template_loader(loader_name)
-        if loader is not None and hasattr(loader, 'get_template_sources'):
+    for loader_name in engines["django"].engine.loaders:
+        loader = engines["django"].engine.find_template_loader(loader_name)
+        if loader is not None and hasattr(loader, "get_template_sources"):
             loaders.append(loader)
     return tuple(loaders)
 
@@ -51,14 +52,15 @@ def fix_inline_tags(content):
     broken Django constructs. To remedy that, we find all the Django tags and
     variables and fix entities inside them.
     """
+
     def repl(match):
         text = match.group(0)
-        text = text.replace('<text:s/>', ' ')
-        text = text.replace('&apos;', "'")
-        text = text.replace('&quot;', '"')
-        return re.sub(r'<[^>]+>', '', text)
+        text = text.replace("<text:s/>", " ")
+        text = text.replace("&apos;", "'")
+        text = text.replace("&quot;", '"')
+        return re.sub(r"<[^>]+>", "", text)
 
-    django_tag_re = r'(\{[\{\%].+?[\%\}]\})'
+    django_tag_re = r"(\{[\{\%].+?[\%\}]\})"
     return re.sub(django_tag_re, repl, content)
 
 
@@ -71,7 +73,7 @@ def find_template_file(template_name):
     """
     for loader in _get_template_loaders():
         for origin in loader.get_template_sources(template_name):
-            path = getattr(origin, 'name', origin)  # Django <1.9 compatibility
+            path = getattr(origin, "name", origin)  # Django <1.9 compatibility
             if os.path.exists(path):
                 return path
     raise TemplateDoesNotExist(template_name)
@@ -85,13 +87,11 @@ def _convert_file(filename, format, result_queue=None, options=None):
     process. This is assisted by inserting the result into a Queue object.
     """
     lo_path = getattr(
-        settings,
-        'TEMPLATED_DOCS_LIBREOFFICE_PATH',
-        '/usr/lib/libreoffice/program/')
+        settings, "TEMPLATED_DOCS_LIBREOFFICE_PATH", "/usr/lib/libreoffice/program/"
+    )
 
     with Office(lo_path) as lo:
-        conv_file = NamedTemporaryFile(delete=False,
-                                       suffix='.%s' % format)
+        conv_file = NamedTemporaryFile(delete=False, suffix=".%s" % format)
         with lo.documentLoad(filename) as doc:
             doc.saveAs(str(conv_file.name), options=options)
         os.unlink(filename)
@@ -105,7 +105,7 @@ def _convert_file(filename, format, result_queue=None, options=None):
 def fill_template(
     template_name,
     context,
-    output_format='odt',
+    output_format="odt",
     options=None,
     separate_process=True,
 ):
@@ -135,25 +135,25 @@ def fill_template(
     if not isinstance(context, Context):
         context = Context(context)
 
-    context['output_format'] = output_format
+    context["output_format"] = output_format
 
     source_file = find_template_file(template_name)
     source_extension = os.path.splitext(source_file)[1]
-    source = zipfile.ZipFile(source_file, 'r')
+    source = zipfile.ZipFile(source_file, "r")
 
     dest_file = NamedTemporaryFile(delete=False, suffix=source_extension)
-    dest = zipfile.ZipFile(dest_file, 'w')
+    dest = zipfile.ZipFile(dest_file, "w")
 
-    manifest_data = ''
+    manifest_data = ""
     for name in source.namelist():
         data = source.read(name)
-        if name.endswith('.xml'):
+        if name.endswith(".xml"):
             data = smart_str(data)
 
-        if any(name.endswith(file) for file in ('content.xml', 'styles.xml')):
+        if any(name.endswith(file) for file in ("content.xml", "styles.xml")):
             template = Template(fix_inline_tags(data))
             data = template.render(context)
-        elif name == 'META-INF/manifest.xml':
+        elif name == "META-INF/manifest.xml":
             manifest_data = data[:-20]  # Cut off the closing </manifest> tag
             continue  # We will append it at the very end
         dest.writestr(name, smart_bytes(data))
@@ -161,16 +161,17 @@ def fill_template(
     for _, image in context.dicts[0].get(IMAGES_CONTEXT_KEY, {}).items():
         filename = os.path.basename(image.name)
         ext = os.path.splitext(filename)[1][1:]
-        manifest_data += ('<manifest:file-entry '
-                          'manifest:media-type="image/%(ext)s" '
-                          'manifest:full-path="Pictures/%(filename)s"/>\n'
-                          ) % locals()
+        manifest_data += (
+            "<manifest:file-entry "
+            'manifest:media-type="image/%(ext)s" '
+            'manifest:full-path="Pictures/%(filename)s"/>\n'
+        ) % locals()
         image.open()
-        dest.writestr('Pictures/%s' % filename, image.read())
+        dest.writestr("Pictures/%s" % filename, image.read())
         image.close()
 
-    manifest_data += '</manifest:manifest>'
-    dest.writestr('META-INF/manifest.xml', manifest_data)
+    manifest_data += "</manifest:manifest>"
+    dest.writestr("META-INF/manifest.xml", manifest_data)
 
     source.close()
     dest.close()
